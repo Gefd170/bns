@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blue Squares Avoidance Game</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #111;
+            font-family: Arial, sans-serif;
+            touch-action: manipulation;
+        }
+        #game-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+        .blue-square {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #6e8efb, #a777e3);
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 255, 0.5);
+        }
+        #player {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #f85032, #e73827);
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        #score {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: white;
+            font-size: 24px;
+        }
+        #game-over {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 36px;
+            text-align: center;
+            display: none;
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 30px;
+            border-radius: 10px;
+        }
+        #restart-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 18px;
+            background: #e73827;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #back-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 8px 15px;
+            background: #333;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <button id="back-btn" onclick="window.location.href='index.html'">Menu</button>
+        <div id="player"></div>
+        <div id="score">Score: 0</div>
+        <div id="game-over">
+            Game Over!<br>
+            <span id="final-score"></span><br>
+            <button id="restart-btn">Play Again</button>
+        </div>
+    </div>
+
+    <script>
+        const gameContainer = document.getElementById('game-container');
+        const player = document.getElementById('player');
+        const scoreElement = document.getElementById('score');
+        const gameOverElement = document.getElementById('game-over');
+        const finalScoreElement = document.getElementById('final-score');
+        const restartBtn = document.getElementById('restart-btn');
+        const backBtn = document.getElementById('back-btn');
+
+        let score = 0;
+        let speed = 2;
+        let spawnRate = 2000; // milliseconds
+        let gameInterval;
+        let spawnInterval;
+        let isGameOver = false;
+        let playerX = window.innerWidth / 2 - 30;
+        let moveRight = false;
+
+        // Initialize player position
+        player.style.left = playerX + 'px';
+
+        // Touch controls for right side of screen
+        gameContainer.addEventListener('touchstart', (e) => {
+            const touchX = e.touches[0].clientX;
+            if (touchX > window.innerWidth / 2) {
+                moveRight = true;
+            }
+        });
+
+        gameContainer.addEventListener('touchend', () => {
+            moveRight = false;
+        });
+
+        // Keyboard controls for testing on desktop
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') {
+                moveRight = true;
+            }
+        });
+
+        document.addEventListener('keyup', (e) => {
+            if (e.key === 'ArrowRight') {
+                moveRight = false;
+            }
+        });
+
+        function startGame() {
+            score = 0;
+            speed = 2;
+            spawnRate = 2000;
+            isGameOver = false;
+            playerX = window.innerWidth / 2 - 30;
+            player.style.left = playerX + 'px';
+            scoreElement.textContent = 'Score: 0';
+            gameOverElement.style.display = 'none';
+
+            // Clear existing squares
+            document.querySelectorAll('.blue-square').forEach(sq => sq.remove());
+
+            // Game loop
+            gameInterval = setInterval(updateGame, 16);
+            spawnInterval = setInterval(spawnSquare, spawnRate);
+
+            // Gradually increase difficulty
+            setInterval(() => {
+                if (!isGameOver) {
+                    speed += 0.1;
+                    spawnRate = Math.max(500, spawnRate - 50);
+                    clearInterval(spawnInterval);
+                    spawnInterval = setInterval(spawnSquare, spawnRate);
+                }
+            }, 5000);
+        }
+
+        function updateGame() {
+            // Move player
+            if (moveRight && playerX < window.innerWidth - 60) {
+                playerX += 5;
+                player.style.left = playerX + 'px';
+            } else if (!moveRight && playerX > 0) {
+                playerX -= 5;
+                player.style.left = playerX + 'px';
+            }
+
+            // Move squares and check collisions
+            document.querySelectorAll('.blue-square').forEach(square => {
+                const squareTop = parseInt(square.style.top || '0') + speed;
+                square.style.top = squareTop + 'px';
+
+                // Check collision with player
+                if (
+                    squareTop + 50 > window.innerHeight - 80 &&
+                    squareTop < window.innerHeight - 20 &&
+                    parseInt(square.style.left) < playerX + 60 &&
+                    parseInt(square.style.left) + 50 > playerX
+                ) {
+                    gameOver();
+                }
+
+                // Remove squares that go off screen
+                if (squareTop > window.innerHeight) {
+                    square.remove();
+                    if (!isGameOver) {
+                        score++;
+                        scoreElement.textContent = `Score: ${score}`;
+                    }
+                }
+            });
+        }
+
+        function spawnSquare() {
+            if (isGameOver) return;
+
+            const square = document.createElement('div');
+            square.className = 'blue-square';
+            const left = Math.random() * (window.innerWidth - 50);
+            square.style.left = left + 'px';
+            square.style.top = '-50px';
+            gameContainer.appendChild(square);
+        }
+
+        function gameOver() {
+            isGameOver = true;
+            clearInterval(gameInterval);
+            clearInterval(spawnInterval);
+            finalScoreElement.textContent = `Final Score: ${score}`;
+            gameOverElement.style.display = 'block';
+        }
+
+        restartBtn.addEventListener('click', startGame);
+
+        // Start the game
+        startGame();
+    </script>
+</body>
+</html>
