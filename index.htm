@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blue Squares Avoidance Game</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #111;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            text-align: center;
+        }
+        .container {
+            max-width: 800px;
+            padding: 20px;
+            background-color: #222;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+        h1 {
+            color: #4a8bfc;
+            margin-bottom: 30px;
+        }
+        .game-instructions {
+            background-color: #333;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            text-align: left;
+        }
+        .btn {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px;
+            transition: background-color 0.3s;
+        }
+        .btn:hover {
+            background-color: #c0392b;
+        }
+        .privacy-link {
+            color: #4a8bfc;
+            text-decoration: none;
+            margin-top: 30px;
+            display: inline-block;
+        }
+        .privacy-link:hover {
+            text-decoration: underline;
+        }
+        ul {
+            text-align: left;
+            margin-left: 20px;
+        }
+        li {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Blue Squares Avoidance Game</h1>
+        
+        <div class="game-instructions">
+            <h2>How to Play:</h2>
+            <ul>
+                <li>Touch the <strong>right side</strong> of the screen to move the red square to the right</li>
+                <li>Release to let it move back to the left automatically</li>
+                <li>Avoid touching the falling blue squares</li>
+                <li>The game gets progressively faster as you play</li>
+                <li>Each avoided square gives you 1 point</li>
+                <li>Game ends when you hit a blue square</li>
+            </ul>
+            
+            <p><strong>Tip:</strong> Time your movements carefully as the speed increases!</p>
+        </div>
+        
+        <button class="btn" onclick="window.location.href='vvb.htm'">START GAME</button>
+        
+        <a href="privacy.html" class="privacy-link">Privacy Policy</a>
+    </div>
+</body>
+</html>
